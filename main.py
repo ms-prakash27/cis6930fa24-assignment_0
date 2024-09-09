@@ -9,7 +9,8 @@ def fetch_data(page=None):
     url = f"https://api.fbi.gov/wanted/v1/list?page={page}"
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Raise an HTTPError for bad responses
+        # Raising an HTTPError for bad responses
+        response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
         print(f"Error fetching data: {e}")

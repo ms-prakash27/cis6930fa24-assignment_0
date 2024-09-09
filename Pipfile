@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 requests = "*"
+requests-mock = "*"
+assignment-0 = {file = ".", editable = true}
 
 [dev-packages]
 
