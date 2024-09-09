@@ -24,8 +24,6 @@ def parse_data(data):
         title = item.get('title', '')
         subjects = item.get('subjects', [])
         field_offices = item.get('field_offices', [])
-
-        # Ensure subjects and field_offices are lists
         if not isinstance(subjects, list):
             subjects = [subjects] if subjects else []
         if not isinstance(field_offices, list):
@@ -42,12 +40,10 @@ def parse_data(data):
 
 def main(page=None, thefile=None):
     if page is not None:
-        print(f"Fetching data from API, page: {page}")
         data = fetch_data(page)
         if not data:
             return
     elif thefile is not None:
-        print(f"Reading data from file: {thefile}")
         try:
             with open(thefile, 'r') as f:
                 data = json.load(f)

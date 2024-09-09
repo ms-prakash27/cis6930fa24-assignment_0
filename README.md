@@ -128,55 +128,25 @@ Defines the thorn character used as a separator in the output.
 #### Functions
 
 1. `fetch_data(page=None)`
-   - Purpose: Retrieves data from the FBI's Most Wanted API
-   - Parameters: 
-     - `page` (optional): Specifies which page of results to fetch
-   - Returns: JSON data from the API or an empty dictionary if there's an error
-   - Implementation details:
-     - Constructs the API URL with the page parameter
-     - Uses `requests.get()` to fetch data
-     - Implements error handling with try/except block
-     - Raises an HTTPError for bad responses
-   - Error Handling:
-     - Catches and reports any `RequestException`
-     - Returns an empty dictionary on error to allow graceful degradation
+   The function fetch_data(page=None) is designed to retrieve data from the FBI's Most Wanted API. It accepts an optional page parameter, which allows users to specify a particular page of results they want to fetch. The function constructs the API URL using this page number and uses requests.get() to make the HTTP request. If the request is successful, it returns the 
+   fetched JSON data. To ensure robustness, it implements error handling using a try/except block to catch any RequestException that may occur during the request. In case of an error, such as network issues or invalid responses, the function raises an HTTPError for bad responses and returns an empty dictionary to allow the system to continue operating smoothly.
 
 2. `parse_data(data)`
-   - Purpose: Processes the JSON data into the required output format
-   - Parameters:
-     - `data`: The JSON data retrieved from the API
-   - Returns: A list of formatted strings, each representing one wanted person's data
-   - Implementation details:
-     - Iterates through each item in the 'items' list of the JSON data
-     - Extracts 'title', 'subjects', and 'field_offices' for each item
-     - Handles cases where 'subjects' or 'field_offices' might not be lists
-     - Joins multiple subjects or field offices with commas
-     - Creates a thorn-separated string for each item
-   - Error Handling:
-     - Uses `.get()` method with default values to handle missing keys
-     - Checks and converts non-list 'subjects' and 'field_offices' to lists
+   The function processes JSON data retrieved from an API into a specific output format. 
+   It takes a single parameter, data, which is the JSON data. The function returns a list
+   of formatted strings, each representing the information of a wanted person. 
+   To achieve this, the function iterates through each item in the 'items' 
+   list of the JSON data, extracting values for 'title', 'subjects', and 'field_offices'. 
+   It handles cases where 'subjects' or 'field_offices' might not be lists by using the .get() 
+   method with default values to manage missing keys and ensuring that any non-list values are 
+   converted to lists. Multiple subjects or field offices are joined with commas. For each item,
+   the function creates a thorn-separated string combining the title, formatted subjects, and 
+   field offices. This approach ensures that the function robustly handles various data scenarios
+   and formats the output correctly.
 
 3. `main(page=None, thefile=None)`
-   - Purpose: Orchestrates the entire process of fetching, parsing, and outputting data
-   - Parameters:
-     - `page` (optional): Page number for API fetching
-     - `thefile` (optional): File path for reading local JSON data
-   - Implementation details:
-     - Determines whether to fetch from API or read from file based on input parameters
-     - Calls `fetch_data()` if `page` is provided
-     - Reads and parses JSON from file if `thefile` is provided
-     - Uses `parse_data()` to process the data
-     - Prints the formatted output to stdout
-   - Error Handling:
-     - Handles file not found and JSON decoding errors when reading from file
-     - Prints informative error messages for various scenarios
+   The function orchestrates the entire process of fetching, parsing, and outputting data. It accepts two optional parameters: page, which specifies the page number for fetching data from the API, and thefile, which provides the file path for reading local JSON data. Depending on which parameter is provided, the function either fetches data from the API using fetch_data() if a page is given or reads and parses JSON from a local file if thefile is specified. Once the data is obtained, it is processed using parse_data(). The function then prints the formatted output to standard output. It includes error handling to manage scenarios such as file not found and JSON decoding errors when reading from the file, ensuring that informative error messages are displayed for various issues that may arise. This approach provides flexibility in sourcing data and robustness in managing potential errors.
 
-#### Command-line Interface
-The script uses `argparse` to create a command-line interface:
-
-- Defines two optional arguments: `--file` and `--page`
-- Calls `main()` with appropriate arguments based on user input
-- Prints help message if no arguments are provided
 
 #### Execution Flow
 1. Script parses command-line arguments
@@ -192,83 +162,41 @@ To run the tests:
 
 ```
 pipenv run python -m pytest -v
+
 ```
 
-we have two test files as shown below
+### 'test_download.py'
 
-### test_download.py
+#### functions
 
-Tests the data downloading functionality:
-- Ensures non-empty data is downloaded from the API
-- Checks if the downloaded data contains the expected fields
+1. `Utility Function`
+   load_test_data(file_path): This function loads test data from a JSON file. It reads the contents of the file specified by file_path and returns the data as a Python dictionary.
 
-#### test_download.py test functions
+2. `test_download_non_empty_data`
+This test ensures that the downloaded data is not empty and contains the necessary structure. It loads the JSON data from wanted.json and simulates the fetching process using main.fetch_data(). The test checks that the fetched data is not None, contains an 'items' key, and has at least one item in the 'items' list.
 
-1. `test_download_non_empty_data`
-   This test checks that the fetch_data function correctly handles
-   non-empty responses from the FBI API. It performs the following checks:
-        The data returned by fetch_data is not None.
-   The data contains the key 'items'.
-   The 'items' list contains at least one item.
-    
-    requests_mock.Mocker() is used to mock the HTTP GET request to the FBI API.
-   The mock response is configured to return a JSON object with a single item.
-   Assertions verify that the data structure is as expected.
+3.  `test_download_data_fields`
+This test validates that each item in the downloaded data contains all required fields. It loads the JSON data from wanted.json and uses main.fetch_data() to simulate the fetching process. The test checks that each item in the 'items' list contains the fields 'title', 'subjects', and 'field_offices', ensuring that the data structure is correct and complete.
 
-2. `test_download_data_fields`
-   This test verifies that each item in the response from fetch_data
-   contains the required fields:
-       Each item should have a 'title' field.
-   Each item should have a 'subjects' field.
-   Each item should have a 'field_offices' field.
+### 'test_randompage.py'
 
-### test_randompage.py
-Tests the data parsing and formatting functionality:
-- Verifies correct extraction of title, subjects, and field offices
-- Ensures proper formatting of the thorn-separated output
+#### Functions
 
 1. `test_extract_title`
-This test checks if the title field is extracted correctly from the data returned by the FBI API:
-    The mocked API response contains a single item with the title field set to "John Doe".
-    The fetch_data function fetches the data, and parse_data processes it.
-    The test asserts that the formatted data contains "John Doe" in the first record.
+The test_extract_title function checks if the title "BORIS YAKOVLEVICH LIVSHITS" is correctly extracted from the JSON data loaded from wanted.json. It ensures that the title is present in the formatted output.
 
-2. `test_extract_subjects`
-This test ensures that the subjects field is extracted and formatted correctly:
-    The mocked API response contains an item with the subjects field set to ["Theft", "Fraud"].
-    The parse_data function should format the subjects as a comma-separated string ("Theft,Fraud").
-    The test checks if "Theft,Fraud" is present in the formatted data.
+2.  `test_extract_subjects`
+The test_extract_subjects function verifies that the subject "Counterintelligence" is included in the comma-separated string of subjects after parsing the data from wanted.json. It confirms proper extraction and formatting.
 
-3. `test_extract_field_offices`
-This test verifies that the field_offices field is correctly extracted and formatted:
-    The mocked API response includes an item with field_offices set to ["Miami", "Dallas"].
-    The parse_data function should format the field offices as a comma-separated string ("Miami,Dallas").
-    The test asserts that "Miami,Dallas" appears in the formatted data.
+3.  `test_extract_field_offices`
+The test_extract_field_offices function ensures that "newyork" appears in the comma-separated list of field offices after parsing the JSON data from wanted.json. It checks the correct extraction and formatting of field offices.
 
-4. `test_print_thorn_separated`
-This test checks the final output formatting, which uses a thorn (þ) character to separate fields:
-    The mocked API response includes title, subjects, and field_offices.
-    The parse_data function should return a string where the fields are separated by the thorn character (þ), e.g., "John DoeþTheft,FraudþMiami,Dallas".
-    The test asserts that the formatted data matches this thorn-separated format.
+4.  `test_print_thorn_separated`
+The test_print_thorn_separated function verifies that the final output string is formatted as "BORIS YAKOVLEVICH LIVSHITSþCounterintelligenceþnewyork". It ensures that data is combined and separated by the thorn character as required.
 
-#### test_randompage.py  functions
+## Assumption
 
-## Assumptions
+In test cases, I have created a wanted.json file from the API(from the first page) and used that, alternatively, we can use API calls using the request mock module, as the page refreshes frequently, I didn't prefer.
 
-This script assumes that the FBI Wanted API (https://api.fbi.gov/wanted/v1/list) is available and working properly.
-The API is expected to return data in a JSON format with an "items" key, which should be a list of entries.
-Each entry should have the fields "title", "subjects", and "field_offices".
 
-The code assumes that the values for "title", "subjects", and "field_offices" in each item of the API response
-will be properly formatted.
 
-The code assumes that "subjects" and "field_offices" are either lists or can be converted to lists if they are not. 
-It also assumes that the THORN character (þ) is appropriate for separating fields in the output.
-
-The script assumes you have Python(preferbly 3.12) and the necessary libraries (requests, argparse, json, and pytest) installed.
-It should run without compatibility problems in this setup.
-
-### Assumption for Tests
-
-The tests use the requests_mock library to mock API responses, 
-assuming that mocking is sufficient to test the behavior of the fetch_data and parse_data functions.
