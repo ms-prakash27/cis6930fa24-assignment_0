@@ -7,6 +7,7 @@ name = "pypi"
 requests = "*"
 requests-mock = "*"
 assignment-0 = {file = ".", editable = true}
+pytest = "*"
 
 [dev-packages]
 
