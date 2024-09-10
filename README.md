@@ -12,71 +12,6 @@ Key features:
 - Supports both API data retrieval and local file reading
 - Includes comprehensive error handling and testing
 
-## Installation
-for  This project runs on Python( here I used 3.12) and pipenv installed in your pc/system
-To install the project, use pipenv:
-
-```
-pip install pipenv
-```
-
-Once pipenv is installed, navigate to your project directory
-
-Create and activate a virtual environment using pipenv:
-```
-pipenv shell
-```
-
-Install the required dependencies for the project:
-```
-pipenv install -e .
-```
-
-we also use  request library in main.py
-
-```
-pipenv install request
-```
-( we can do this manually anyway it will be installed in dependencies in the above step)
-
-## How to run
-
-The project can be run in two primary modes:
-
-1. Fetch data from the FBI API:
-
-```
-pipenv run python main.py --page <interger>
-```
-    
-ex : 
-```
-pipenv run python main.py --page 1
-```
-
-Replace `<integer>` with the desired page number of the API results.
-
-2. Read data from a local JSON file:
-
-```
-pipenv run python main.py --file <file-location>
-```
-    
-or we can use
-    
-ex : 
-```
-pipenv run python main.py --file wanted.json
-```
-
-Replace <file-location>with the path to your local JSON file.
-
-Output Format:
-```
-{title}þ{subjects}þ{field_offices}
-```
-Where `þ` is the lowercase thorn character used as a separator. Multiple subjects or field offices are comma-separated.
-
 ## Project Structure
 
 ```
@@ -101,9 +36,72 @@ cis6930fa24-assignment0/
 - `COLLABORATORS.md`: Lists project collaborators and resources used
 - `LICENSE`: Contains the project's license information
 
+
+## Installation - How to install
+for  This project runs on Python( here I used 3.12) and pipenv installed in my pc
+To install the project, use pipenv:
+
+```
+pip install pipenv
+```
+
+Once pipenv is installed, navigate to your project directory
+
+Create and activate a virtual environment using pipenv:
+```
+pipenv shell
+```
+
+Install the required dependencies for the project:
+```
+pipenv install -e .
+```
+or simply use
+
+```
+pipenv install
+```
+
+## How to run
+
+The project can be run in two primary modes:
+
+1. Fetch data from the FBI API:
+
+```
+pipenv run python main.py --page <interger>
+```
+Replace `<integer>` with the desired page number of the API results.
+ex : 
+```
+pipenv run python main.py --page 1
+```
+
+
+
+2. Read data from a local JSON file:
+
+```
+pipenv run python main.py --file <file-location>
+```
+or we can use if it is same location
+    
+ex : 
+```
+pipenv run python main.py --file wanted.json 
+```
+
+Replace <file-location>with the path to your local JSON file.
+
+Output Format:
+```
+{title}þ{subjects}þ{field_offices}
+```
+Where `þ` is the lowercase thorn character used as a separator. Multiple subjects or field offices are comma-separated.
+
 ## Functions/Code Explanation
 
-### main.py
+### main.py file
 
 #### Import Statements
 
@@ -122,10 +120,9 @@ import json
 ```python
 THORN = 'þ'
 ```
-
 Defines the thorn character used as a separator in the output.
 
-#### Functions
+#### Functions inside main
 
 1. `fetch_data(page=None)`
    The function fetch_data(page=None) is designed to retrieve data from the FBI's Most Wanted API. It accepts an optional page parameter, which allows users to specify a particular page of results they want to fetch. The function constructs the API URL using this page number and uses requests.get() to make the HTTP request. If the request is successful, it returns the 
@@ -148,7 +145,8 @@ Defines the thorn character used as a separator in the output.
    The function orchestrates the entire process of fetching, parsing, and outputting data. It accepts two optional parameters: page, which specifies the page number for fetching data from the API, and thefile, which provides the file path for reading local JSON data. Depending on which parameter is provided, the function either fetches data from the API using fetch_data() if a page is given or reads and parses JSON from a local file if thefile is specified. Once the data is obtained, it is processed using parse_data(). The function then prints the formatted output to standard output. It includes error handling to manage scenarios such as file not found and JSON decoding errors when reading from the file, ensuring that informative error messages are displayed for various issues that may arise. This approach provides flexibility in sourcing data and robustness in managing potential errors.
 
 
-#### Execution Flow
+#### Execution Flow for the main function is as given below
+
 1. Script parses command-line arguments
 2. Based on arguments, it either:
    a. Fetches data from the API using `fetch_data()`
@@ -158,19 +156,19 @@ Defines the thorn character used as a separator in the output.
 
 ## Testing
 
+for testing the data we can't do that by api call, since the data changes frequently I checked it with json file which contains same as page 1 of fbi wanted page
+
 To run the tests:
 
 ```
 pipenv run python -m pytest -v
-
 ```
+### 'test_download.py' file
 
-### 'test_download.py'
+#### Functions
 
-#### functions
-
-1. `Utility Function`
-   load_test_data(file_path): This function loads test data from a JSON file. It reads the contents of the file specified by file_path and returns the data as a Python dictionary.
+1. `Utility Function : load_test_data(file_path)`
+    This function loads test data from a JSON file. It reads the contents of the file specified by file_path and returns the data as a Python dictionary.
 
 2. `test_download_non_empty_data`
 This test ensures that the downloaded data is not empty and contains the necessary structure. It loads the JSON data from wanted.json and simulates the fetching process using main.fetch_data(). The test checks that the fetched data is not None, contains an 'items' key, and has at least one item in the 'items' list.
@@ -178,7 +176,7 @@ This test ensures that the downloaded data is not empty and contains the necessa
 3.  `test_download_data_fields`
 This test validates that each item in the downloaded data contains all required fields. It loads the JSON data from wanted.json and uses main.fetch_data() to simulate the fetching process. The test checks that each item in the 'items' list contains the fields 'title', 'subjects', and 'field_offices', ensuring that the data structure is correct and complete.
 
-### 'test_randompage.py'
+### 'test_randompage.py' file
 
 #### Functions
 
@@ -194,9 +192,18 @@ The test_extract_field_offices function ensures that "newyork" appears in the co
 4.  `test_print_thorn_separated`
 The test_print_thorn_separated function verifies that the final output string is formatted as "BORIS YAKOVLEVICH LIVSHITSþCounterintelligenceþnewyork". It ensures that data is combined and separated by the thorn character as required.
 
-## Assumption
+## Assumptions
 
 In test cases, I have created a wanted.json file from the API(from the first page) and used that, alternatively, we can use API calls using the request mock module, as the page refreshes frequently, I didn't prefer.
 
+The format of the JSON data given by the FBI API is considered to remain consistent over time. This comprises keys such as items, title, subjects, and field_offices.
+
+Ex:
+```
+ m.get('https://api.fbi.gov/wanted/v1/list?page=1', json={
+            "items": [
+              {"title": "BORIS YAKOVLEVICH LIVSHITS", "subjects": ["Counterintelligence"], "field_offices": ["newyork"]}
+         ]  })
+```
 
 
