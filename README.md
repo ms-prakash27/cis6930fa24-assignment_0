@@ -6,6 +6,7 @@ The main objective of this project is to create a Python package that interacts 
 retrieves data about wanted individuals, and formats this data into a specific output format,here we used thorn character.
 
 Key features:
+
 - Fetches data from the FBI's Most Wanted API
 - Parses JSON data and extracts relevant information
 - Formats data into a thorn-separated output
